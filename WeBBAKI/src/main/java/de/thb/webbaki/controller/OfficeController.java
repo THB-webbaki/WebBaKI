@@ -51,8 +51,8 @@ public class OfficeController {
     public String deactivateUser(@ModelAttribute("form") @Valid UserFormModel form){
         System.out.println(form.getUsers());
 
-        userService.changeEnabledStatus(form);
         userService.changeBranch(form);
+        userService.changeEnabledStatus(form);
 
         return "redirect:office";
     }

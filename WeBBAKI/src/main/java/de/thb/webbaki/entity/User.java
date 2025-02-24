@@ -18,6 +18,8 @@ import java.util.Set;
 @Setter
 @Entity
 public class User {
+    public static String pseudonomizationString = "-";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -68,5 +70,9 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public boolean isPseudonymized(){
+        return pseudonomizationString.equals(username);
     }
 }
