@@ -22,14 +22,14 @@ import de.thb.webbaki.service.questionnaire.QuestionnaireService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.persistence.NonUniqueResultException;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.*;
 
-import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
@@ -40,7 +40,8 @@ import java.time.LocalDateTime;
 @Transactional
 @Slf4j
 public class UserService {
-    private UserRepository userRepository; ////initialize repository Object
+    private UserRepository userRepository;
+    /// /initialize repository Object
     private RoleRepository roleRepository;
     private RoleService roleService;
     private PasswordEncoder passwordEncoder;
@@ -72,7 +73,11 @@ public class UserService {
     }
 
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        try {
+            return userRepository.findByUsername(username);
+        } catch (Exception e){
+            return null;
+        }
     }
 
     public List<User> getUsersByBranch(String branche) {
@@ -135,7 +140,7 @@ public class UserService {
             user.setCompany(form.getCompany());
             user.setPassword(passwordEncoder.encode(form.getPassword()));
             user.setEmail(form.getEmail());
-            user.setEnabled(true);
+            user.setEnabled(false);
 
             //set the role to "Geschäftsstelle" if this Branche is chosen
             if (userBranch.getName().equals("Geschäftsstelle")) {
@@ -185,10 +190,14 @@ public class UserService {
             confirmationTokenService.setConfirmedAt(token);
             confirmAdmin(token);
         }
-        enableUser(user.getUsername(), token);
+        user.setEnabled(true);
+        userRepository.save(user);
+        List<User> users = getAllUsers();
+        //enableUser(user.getUsername(), token);
 
-        emailSender.send(user.getEmail(), userEnabledNotification.finalEnabledConfirmation(user.getFirstName(), user.getLastName()));
-
+        new Thread(() -> {
+            emailSender.send(user.getEmail(), userEnabledNotification.finalEnabledConfirmation(user.getFirstName(), user.getLastName()));
+        }).start();
         return "confirmation/confirm";
     }
 
@@ -297,6 +306,8 @@ public class UserService {
         for (int i = 0; i < userToRoleFormModel.getUsers().size(); i++) {
 
             User user = getUserByUsername(userToRoleFormModel.getUsers().get(i).getUsername());
+            if(user == null)
+                continue;
 
             String roleString = userToRoleFormModel.getRole().get(i);
             String roleDelString = userToRoleFormModel.getRoleDel().get(i);
@@ -367,29 +378,35 @@ public class UserService {
     public void changeEnabledStatus(UserFormModel form) {
 
         List<User> users = getAllUsers();
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+            User changedUser = form.getUsers().get(i);
+            if (user.isEnabled() != (changedUser.isEnabled()) && !changedUser.isPseudonymized()) {
+                user.setEnabled(changedUser.isEnabled());
+                if(!user.isEnabled()) {
+                    user.setFirstName(User.pseudonomizationString);
+                    user.setLastName(User.pseudonomizationString);
+                    user.setEmail(User.pseudonomizationString);
+                    user.setUsername(User.pseudonomizationString);
+                }
+                userRepository.save(user);
 
-        /*Outsourcing Mail to thread for speed purposes*/
-        new Thread(() -> {
-            for (int i = 0; i < users.size(); i++) {
-
-                if (users.get(i).isEnabled() != (form.getUsers().get(i).isEnabled())) {
-                    users.get(i).setEnabled(form.getUsers().get(i).isEnabled());
-
-
-                    emailSender.send(users.get(i).getEmail(), userChangeEnabledStatusNotification.changeBrancheMail(users.get(i).getFirstName(), users.get(i).getLastName()));
+                new Thread(() -> {
+                    emailSender.send(user.getEmail(), userChangeEnabledStatusNotification.changeBrancheMail(user.getFirstName(), user.getLastName()));
 
                     for (User officeAdmin : getUserByOfficeRole()) {
                         //only send it to enabled users
                         if (officeAdmin.isEnabled()) {
                             emailSender.send(officeAdmin.getEmail(), AdminDeactivateUserSubmit.changeEnabledStatus(officeAdmin.getFirstName(),
                                     officeAdmin.getLastName(),
-                                    users.get(i).isEnabled(),
-                                    users.get(i).getUsername()));
+                                    user.isEnabled(),
+                                    user.getUsername()));
+
                         }
                     }
-                }
+                }).start();
             }
-        }).start();
+        }
     }
 
     /**
@@ -401,13 +418,12 @@ public class UserService {
 
         for (int i = 0; i < form.getUsers().size(); i++) {
 
+
             User user = getUserByUsername(form.getUsers().get(i).getUsername());
+            if(user == null || user.getBranch().getName().equals("GESCHÄFTSSTELLE"))
+                continue;
 
-            if (user.getBranch().getName().equals("GESCHÄFTSSTELLE")) {
-                System.err.println("Die Branche Geschäftsstelle kann nicht verändert werden.");
-            }
-
-            if (!user.getBranch().getName().equals(form.getBranchesAsString().get(i)) && !user.getBranch().getName().equals("GESCHÄFTSSTELLE")) {
+            if (!user.getBranch().getName().equals(form.getBranchesAsString().get(i)) ) {
                 //only the branchname was changed!!! not the id. SO we have to get the new one
                 user.setBranch(branchService.getBranchByName(form.getBranchesAsString().get(i)));
                 userRepository.save(user);

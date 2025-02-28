@@ -38,7 +38,7 @@
                     <td th:text="${user.roles}"></td>
                     <th:block>
                         <td>
-                            <select id="showRisk" class="form-select" th:field="*{role[__${itemStat.index}__]}">
+                            <select id="showRisk" class="form-select" th:field="*{role[__${itemStat.index}__]}" th:disabled="*{users[__${itemStat.index}__].isPseudonymized() }">
                                 <option value="none">Bitte auswählen:</option>
                                 <option th:each="role : ${roles}"  th:unless="${user.getRoles().contains(role)}"
                                         th:value="${role.name}" th:text="${role}">
@@ -48,7 +48,7 @@
                     </th:block>
                     <th:block>
                         <td>
-                            <select class="form-select" th:field="*{roleDel[__${itemStat.index}__]}">
+                            <select class="form-select" th:field="*{roleDel[__${itemStat.index}__]}" th:disabled="*{users[__${itemStat.index}__].isPseudonymized() }">
                                 <option value="none">Bitte auswählen:</option>
                                 <option th:each="role : ${user.getRoles()}"
                                         th:value="${role.name}" th:text="${role}">
