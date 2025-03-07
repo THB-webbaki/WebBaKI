@@ -27,6 +27,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 
@@ -139,8 +140,9 @@ public class  ReportService {
         //go through all sectors with their ReportScenarios, calculate the average for every Scenario, and save it for a Report
         sectorMapOftReportScenarioListMaps.forEach((sector, mapOfReportScenarioLists) -> {
             //get the number of questionnaires by taking one list of ReportScenarios and his size
-            //TODO: same problem with numberOfQuestionnaires as Branch
-            int numberOfQuestionnaires = mapOfReportScenarioLists.values().iterator().next().size();
+
+            int numberOfQuestionnaires = mapOfReportScenarioLists.values().stream().mapToInt(List::size).max().orElse(0);
+
             Report branchReport = Report.builder().snapshot(snapshot).sector(sector).numberOfQuestionnaires(numberOfQuestionnaires).build();
             reportRepository.save(branchReport);
 
@@ -169,8 +171,8 @@ public class  ReportService {
         //go through all branches with their ReportScenarios, calculate the average for every Scenario, and save it for a Report
         branchMapOftReportScenarioListMaps.forEach((branch, mapOfReportScenarioLists) -> {
             //get the number of questionnaires by taking one list of ReportScenarios and his size
-            //TODO number of questionnaire could be false if not every UserScenario is there for every Scenario
-            int numberOfQuestionnaires = mapOfReportScenarioLists.values().iterator().next().size();
+
+            int numberOfQuestionnaires = mapOfReportScenarioLists.values().stream().mapToInt(List::size).max().orElse(0);
 
             Report branchReport = Report.builder().snapshot(snapshot).branch(branch).numberOfQuestionnaires(numberOfQuestionnaires).build();
             reportRepository.save(branchReport);
