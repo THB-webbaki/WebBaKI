@@ -68,10 +68,11 @@ public class PasswordResetTokenService {
 
         String token = UUID.randomUUID().toString();
 
+        passwordResetTokenRepository.deleteAllByUser(user);
         PasswordResetToken myToken = new PasswordResetToken(user, token);
         passwordResetTokenRepository.save(myToken);
 
-        emailSender.send(user.getEmail(), resetPasswordNotification.resetPasswordMail(user.getFirstName(), user.getLastName(), token));
+        new Thread(() -> emailSender.send(user.getEmail(), resetPasswordNotification.resetPasswordMail(user.getFirstName(), user.getLastName(), token))).start();
     }
 
     /**
