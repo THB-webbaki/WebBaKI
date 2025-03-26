@@ -2,11 +2,11 @@ package de.thb.webbaki.service.snapshot;
 
 import de.thb.webbaki.entity.snapshot.Snapshot;
 import de.thb.webbaki.repository.snapshot.SnapshotRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

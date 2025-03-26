@@ -1,21 +1,17 @@
 package de.thb.webbaki.mail;
 
 import de.thb.webbaki.service.UserService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service("emailService")
 @AllArgsConstructor

@@ -17,24 +17,13 @@ import de.thb.webbaki.service.UserService;
 import de.thb.webbaki.service.helper.Counter;
 import de.thb.webbaki.service.snapshot.ReportService;
 import de.thb.webbaki.service.snapshot.SnapshotService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.context.Context;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.temporal.IsoFields;
-import java.util.ArrayList;
-import java.util.List;
-
+import jakarta.validation.Valid;
 @Controller
 @AllArgsConstructor
 public class ThreatMatrixController {
