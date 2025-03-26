@@ -1,11 +1,10 @@
 package de.thb.webbaki.entity.questionnaire;
 
 import de.thb.webbaki.entity.Scenario;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import java.text.DecimalFormat;
+import jakarta.validation.constraints.Size;
 
 /**
  * A UserScenario is one filled row of  a Questionnaire.

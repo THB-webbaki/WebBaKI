@@ -1,10 +1,9 @@
 package de.thb.webbaki.entity;
 
-import de.thb.webbaki.enums.SzenarioType;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.util.Objects;
 
 @Builder
