@@ -3,11 +3,10 @@ package de.thb.webbaki.entity.snapshot;
 import de.thb.webbaki.entity.Branch;
 import de.thb.webbaki.entity.Sector;
 import de.thb.webbaki.entity.User;
-import de.thb.webbaki.entity.snapshot.Snapshot;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @Builder

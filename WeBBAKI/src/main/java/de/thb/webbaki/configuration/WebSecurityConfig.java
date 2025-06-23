@@ -1,95 +1,78 @@
 package de.thb.webbaki.configuration;
 
-
-import de.thb.webbaki.entity.User;
-import de.thb.webbaki.repository.UserRepository;
 import de.thb.webbaki.security.CustomAuthenticationFailureHandler;
 import de.thb.webbaki.security.MyUserDetailsService;
-import de.thb.webbaki.service.Exceptions.UserNotEnabledException;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-/**
- * Configuration for the security.
- */
 
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-//Used for @PreAuthorize in SuperAdminController.java
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+@RequiredArgsConstructor
+public class WebSecurityConfig {
 
-    private MyUserDetailsService userDetailsService;
-    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final MyUserDetailsService userDetailsService;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final PasswordEncoder passwordEncoder;
 
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
-    }
-
-    /**
-     * Adds all paths with authorities.
-     * @param http
-     * @throws Exception
-     */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // @formatter:off
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                    .antMatchers("/css/**", "/webjars/**", "/bootstrap/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                    .antMatchers("/", "/home", "/register/**", "/success_register", "/confirmation/confirmByUser/**", "datenschutz").permitAll()
-                    .antMatchers("/admin").access("hasAuthority('ROLE_SUPERADMIN')")
-                    .antMatchers("/office").access("hasAuthority('ROLE_GESCHÄFTSSTELLE')")
-                    .antMatchers("/threatmatrix/**").access("hasAuthority('ROLE_KRITIS_BETREIBER')")
-                    .antMatchers("/report/company/**").access("hasAuthority('ROLE_KRITIS_BETREIBER')")
-                    .antMatchers("/report/branche/**").hasAnyAuthority("ROLE_KRITIS_BETREIBER", "ROLE_BRANCHENADMIN", "ROLE_SEKTORENADMIN", "ROLE_BUNDESADMIN")
-                    .antMatchers("/report/sector/**").hasAnyAuthority("ROLE_KRITIS_BETREIBER", "ROLE_SEKTORENADMIN", "ROLE_BUNDESADMIN")
-                    .antMatchers("/report/national/**").hasAnyAuthority("ROLE_KRITIS_BETREIBER", "ROLE_BUNDESADMIN")
-                    .antMatchers("/snap/**").access("hasAuthority('ROLE_SUPERADMIN')")
-                    .antMatchers("/scenarios").access("hasAuthority('ROLE_SUPERADMIN')")
-                    .antMatchers("/adjustHelp").access("hasAuthority('ROLE_SUPERADMIN')")
-                    .antMatchers("/help", "/horizontal_vertical_comparison/**").hasAnyAuthority("ROLE_KRITIS_BETREIBER")
-                    .antMatchers("/confirmation/confirm/**").access("hasAuthority('ROLE_GESCHÄFTSSTELLE')")
-                .and()
-                    .formLogin()
-                    .loginPage("/login")
-                    .failureHandler(customAuthenticationFailureHandler)
-                    .usernameParameter("email")
-                    .usernameParameter("username")
-                    .permitAll()
-                .and()
-                    .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .logoutSuccessUrl("/").permitAll()
-                .and()
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                    .invalidSessionUrl("/login?expired")
-                    .maximumSessions(1)
-                    .expiredUrl("/logout");
+                .authenticationProvider(authenticationProvider())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**", "/webjars/**", "/bootstrap/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/home", "/register/**", "/success_register", "/confirmation/confirmByUser/**", "/datenschutz").permitAll()
+                        .requestMatchers("/admin").hasAuthority("ROLE_SUPERADMIN")
+                        .requestMatchers("/office").hasAuthority("ROLE_GESCHÄFTSSTELLE")
+                        .requestMatchers("/threatmatrix/**").hasAuthority("ROLE_KRITIS_BETREIBER")
+                        .requestMatchers("/report/company/**").hasAuthority("ROLE_KRITIS_BETREIBER")
+                        .requestMatchers("/report/branche/**").hasAnyAuthority("ROLE_KRITIS_BETREIBER", "ROLE_BRANCHENADMIN", "ROLE_SEKTORENADMIN", "ROLE_BUNDESADMIN")
+                        .requestMatchers("/report/sector/**").hasAnyAuthority("ROLE_KRITIS_BETREIBER", "ROLE_SEKTORENADMIN", "ROLE_BUNDESADMIN")
+                        .requestMatchers("/report/national/**").hasAnyAuthority("ROLE_KRITIS_BETREIBER", "ROLE_BUNDESADMIN")
+                        .requestMatchers("/snap/**", "/scenarios", "/adjustHelp").hasAuthority("ROLE_SUPERADMIN")
+                        .requestMatchers("/help", "/horizontal_vertical_comparison/**").hasAuthority("ROLE_KRITIS_BETREIBER")
+                        .requestMatchers("/confirmation/confirm/**").hasAuthority("ROLE_GESCHÄFTSSTELLE")
+                        .anyRequest().permitAll()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .failureHandler(customAuthenticationFailureHandler)
+                        .usernameParameter("username")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/").permitAll()
+                )
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/login?expired")
+                        .maximumSessions(1)
+                        .expiredUrl("/logout")
+                );
 
-        http.headers()
-                .xssProtection()
-                .and()
-                .contentSecurityPolicy("form-action 'self'");
+        http.headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives("form-action 'self'"))
+        );
+
+        return http.build();
     }
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
     }
-
 }

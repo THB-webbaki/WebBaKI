@@ -14,6 +14,7 @@ import de.thb.webbaki.service.ScenarioService;
 import de.thb.webbaki.service.UserService;
 import de.thb.webbaki.service.helper.MappingReport;
 import de.thb.webbaki.service.questionnaire.QuestionnaireService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -22,7 +23,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import javax.transaction.Transactional;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

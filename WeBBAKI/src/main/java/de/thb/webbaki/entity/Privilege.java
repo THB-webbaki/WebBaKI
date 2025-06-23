@@ -1,9 +1,9 @@
 package de.thb.webbaki.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
 

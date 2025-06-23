@@ -1,11 +1,11 @@
 package de.thb.webbaki.entity.questionnaire;
 
 import de.thb.webbaki.entity.User;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 

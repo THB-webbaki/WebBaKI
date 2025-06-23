@@ -19,10 +19,11 @@ import de.thb.webbaki.service.Exceptions.EmailNotMatchingException;
 import de.thb.webbaki.service.Exceptions.PasswordNotMatchingException;
 import de.thb.webbaki.service.Exceptions.UserAlreadyExistsException;
 import de.thb.webbaki.service.questionnaire.QuestionnaireService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import javax.persistence.NonUniqueResultException;
+
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,6 @@ import org.springframework.ui.Model;
 
 import java.util.*;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 
