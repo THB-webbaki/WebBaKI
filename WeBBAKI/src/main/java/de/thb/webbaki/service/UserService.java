@@ -311,8 +311,7 @@ public class UserService {
 
             String roleString = userToRoleFormModel.getRole().get(i);
             String roleDelString = userToRoleFormModel.getRoleDel().get(i);
-
-            if (!roleString.equals("none")) {
+            if (roleString != null && !roleString.equals("none")) {
                 Role role = roleService.getRoleByName(roleString);
                 //only add a role to a person, if he not already has this role
                 if (!user.getRoles().contains(role)) {
@@ -340,7 +339,7 @@ public class UserService {
                 }
             }
 
-            if (!roleDelString.equals("none")) {
+            if (roleDelString != null && !roleDelString.equals("none")) {
                 Role roleDel = roleService.getRoleByName(roleDelString);
                 user.getRoles().remove(roleDel);
 
@@ -362,7 +361,7 @@ public class UserService {
                 }).start();
             }
 
-            if (!roleDelString.equals("none") || !roleString.equals("none")) {
+            if ((roleDelString != null && !roleDelString.equals("none")) || (roleString != null &&!roleString.equals("none"))) {
                 saveUser(user);
             }
 

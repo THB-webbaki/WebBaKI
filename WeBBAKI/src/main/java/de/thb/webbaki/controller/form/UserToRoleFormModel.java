@@ -19,4 +19,6 @@ public class UserToRoleFormModel {
     private List<String> roleDel;
     //Get User for Role
     private List<User> users;
+
+    private String password;
 }

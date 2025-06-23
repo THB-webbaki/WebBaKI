@@ -16,6 +16,8 @@ import de.thb.webbaki.service.snapshot.SnapshotService;
 import de.thb.webbaki.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,7 @@ public class SuperAdminController implements Comparable {
     private final SnapshotService snapshotService;
     private final MasterScenarioService masterScenarioService;
     private final ScenarioService scenarioService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     HelpPathReader helpPathReader;
@@ -50,6 +53,7 @@ public class SuperAdminController implements Comparable {
                 .users(users)
                 .role(emptyUsers)
                 .roleDel(emptyUsers)
+                .password("")
                 .build();
 
         model.addAttribute("roleForm", formModel);
@@ -60,7 +64,10 @@ public class SuperAdminController implements Comparable {
     }
 
     @PostMapping("/admin")
-    public String addRoleToUser(@ModelAttribute("roleForm") @Valid UserToRoleFormModel userToRoleFormModel, Model model) {
+    public String addRoleToUser(@ModelAttribute("roleForm") @Valid UserToRoleFormModel userToRoleFormModel, Model model, Authentication authentication) {
+        if(!passwordEncoder.matches(userToRoleFormModel.getPassword(), userService.getUserByUsername(authentication.getName()).getPassword())){
+            return "redirect:admin?error=password";
+        }
 
         userService.addAndDeleteRoles(userToRoleFormModel);
 
