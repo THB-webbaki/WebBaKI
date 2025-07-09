@@ -3,8 +3,8 @@ package de.thb.webbaki.security.passwordValidation;
 import de.thb.webbaki.controller.form.ChangeCredentialsForm;
 import de.thb.webbaki.controller.form.UserRegisterFormModel;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class PasswordMatchesValidator
         implements ConstraintValidator<PasswordMatches, Object> {

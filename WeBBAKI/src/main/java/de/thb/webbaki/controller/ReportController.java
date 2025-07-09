@@ -10,6 +10,7 @@ import de.thb.webbaki.service.helper.Counter;
 import de.thb.webbaki.service.helper.MappingReport;
 import de.thb.webbaki.service.snapshot.ReportService;
 import de.thb.webbaki.service.snapshot.SnapshotService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.csrf.CsrfToken;
@@ -22,8 +23,7 @@ import java.util.List;
 
 import org.thymeleaf.context.Context;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class ReportController {

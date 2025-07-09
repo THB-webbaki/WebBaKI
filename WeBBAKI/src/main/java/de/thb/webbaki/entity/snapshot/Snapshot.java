@@ -1,8 +1,8 @@
 package de.thb.webbaki.entity.snapshot;
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
