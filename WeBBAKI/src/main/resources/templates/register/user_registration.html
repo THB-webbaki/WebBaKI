@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout.html}">
 <head>
-    <title>Registrieren</title>
+    <title>Registrieren Test</title>
 </head>
 <body>
 <!-- CSRF-Token -->
@@ -74,7 +74,7 @@
                             </div>
 
                         </div>
-                        <div class="cf-turnstile" th:data-sitekey="${@turnstileService.getSitekey()}"></div>
+                        <div class="cf-turnstile" th:if="${@turnstileService.getUse()}" th:attr="data-sitekey=${@turnstileService.getSitekey()}"></div>
                     </form>
                     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
                     <p class="text-center mt-3 text-secondary">Haben sie einen Account? <a th:href="@{/login}">Jetzt
