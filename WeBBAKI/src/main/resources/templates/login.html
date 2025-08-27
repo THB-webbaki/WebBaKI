@@ -33,7 +33,10 @@
                     <button type="submit" class="btn btn-primary">Anmelden</button>
                     <a class="forgotPassword" href="/request_password_reset">Passwort vergessen?</a>
                 </div>
+                <div class="cf-turnstile" th:data-sitekey="${@turnstileService.getSitekey()}"></div>
+
             </form>
+            <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
         </div>
     </div>
 </div>

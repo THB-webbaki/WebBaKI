@@ -74,7 +74,9 @@
                             </div>
 
                         </div>
+                        <div class="cf-turnstile" th:data-sitekey="${@turnstileService.getSitekey()}"></div>
                     </form>
+                    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
                     <p class="text-center mt-3 text-secondary">Haben sie einen Account? <a th:href="@{/login}">Jetzt
                         anmelden</a>.
                     </p>
