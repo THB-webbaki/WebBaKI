@@ -49,6 +49,11 @@ This is a standard Spring Boot application following conventional mechanisms and
 - `EXPIRY_ADMIN`: Admin expiry duration in days (default: `14`).
 - `EXPIRY_USER`: User expiry duration in days (default: `3`).
 
+#### TURNSTILE
+- `TURNSTILE_SECRET`: Secret from Cloudflare.
+- `TURNSTILE_SITEKEY`: Sitekey from Cloudflare.
+- `TURNSTILE_USE`: Specifies if the web-app should use Turnstile (default: `true`).
+
 ---
 
 ## Initial Setup
